@@ -13,7 +13,6 @@ st.set_page_config(
 # ---------- 自定义 CSS（淡蓝粉紫 · 毛玻璃 · 精美排版） ----------
 st.markdown("""
 <style>
-    /* 字体 & 全局 */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     .stApp {
         background: radial-gradient(circle at 10% 20%, #f0e6ff 0%, #e0f0ff 50%, #f5e6ff 100%);
@@ -27,7 +26,7 @@ st.markdown("""
         padding: 0 1.8rem 2rem;
     }
 
-    /* ----- 顶部导航 ----- */
+    /* 顶部导航 */
     .top-nav {
         display: flex;
         align-items: center;
@@ -68,7 +67,7 @@ st.markdown("""
         color: #7c5cbf;
     }
 
-    /* ----- Hero 区域（带背景图） ----- */
+    /* Hero */
     .hero {
         position: relative;
         border-radius: 28px;
@@ -115,7 +114,7 @@ st.markdown("""
         box-shadow: 0 6px 25px rgba(120, 100, 200, 0.4);
     }
 
-    /* ----- 卡片（毛玻璃 · 淡蓝粉紫） ----- */
+    /* 卡片 */
     .card-wrapper {
         background: rgba(255, 255, 255, 0.55);
         backdrop-filter: blur(12px);
@@ -148,14 +147,15 @@ st.markdown("""
         flex-direction: column;
     }
     .card-title {
-        font-size: 1.1rem;
+        font-size: 1.0rem;
         font-weight: 700;
         color: #2f2a4a;
         margin-bottom: 0.3rem;
         line-height: 1.3;
+        word-break: break-all;
     }
     .card-desc {
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         color: #4a4a6a;
         line-height: 1.5;
         flex: 1;
@@ -165,7 +165,7 @@ st.markdown("""
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.6rem;
+        gap: 0.5rem;
         margin-top: auto;
     }
     .qr-container {
@@ -199,12 +199,11 @@ st.markdown("""
         transform: scale(1.02);
         box-shadow: 0 4px 18px rgba(120, 100, 200, 0.25);
     }
-    /* 按钮交替颜色（粉紫 / 蓝紫） */
     .btn-alt .stLinkButton button {
         background: linear-gradient(90deg, #c9b0ff, #a8d8ff);
     }
 
-    /* ----- 优势卡片（浅色） ----- */
+    /* 优势 */
     .adv-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -240,7 +239,7 @@ st.markdown("""
         line-height: 1.4;
     }
 
-    /* ----- 二维码集中展示卡片 ----- */
+    /* 二维码集中展示 */
     .qr-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -270,7 +269,8 @@ st.markdown("""
     .qr-grid-item .qr-name {
         font-weight: 600;
         color: #2f2a4a;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+        word-break: break-all;
     }
     .qr-grid-item .qr-url {
         font-size: 0.7rem;
@@ -279,7 +279,7 @@ st.markdown("""
         line-height: 1.3;
     }
 
-    /* ----- 页脚 ----- */
+    /* 页脚 */
     .footer {
         text-align: center;
         border-top: 1px solid rgba(180, 160, 220, 0.2);
@@ -315,7 +315,6 @@ st.markdown("""
         color: #7c5cbf;
     }
 
-    /* 响应式 */
     @media (max-width: 1024px) {
         .adv-grid { grid-template-columns: repeat(2, 1fr); }
         .qr-grid { grid-template-columns: repeat(2, 1fr); }
@@ -347,7 +346,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ---------- Hero 区域 ----------
+# ---------- Hero ----------
 st.markdown("""
 <div class="hero">
     <div class="hero-overlay">
@@ -362,70 +361,70 @@ st.markdown("""
 st.markdown('<h2 id="features" style="text-align:center; color:#2f2a4a; margin-top:1.5rem;">系统功能介绍</h2>', unsafe_allow_html=True)
 st.markdown('<p style="text-align:center; color:#4a4a6a; margin-bottom:1.8rem;">我们提供多个专业数据系统，满足企业不同维度的分析需求</p>', unsafe_allow_html=True)
 
-# ---------- 链接数据（可自由修改名称、描述、URL） ----------
+# ---------- 链接数据：标题 = 域名/路径（完全对应） ----------
 links_info = [
     {
-        "name": "新预测模型",
+        "name": "newprediction-mg4o5rgtrygzhu2vrsznth.streamlit.app",
         "desc": "全新升级的企业预测分析模型，提供精准趋势预测，辅助决策制定。",
         "url": "https://newprediction-mg4o5rgtrygzhu2vrsznth.streamlit.app/",
         "seed": 10
     },
     {
-        "name": "数字经济分析",
+        "name": "digital-encomy.streamlit.app",
         "desc": "专注全球数字经济发展趋势分析，数据可视化呈现产业经济现状。",
         "url": "https://digital-encomy.streamlit.app/",
         "seed": 20
     },
     {
-        "name": "数字经济主站",
+        "name": "digital-encomy-main.streamlit.app",
         "desc": "整合多维数据资源，交互式图表展示经济指标，支持自定义筛选。",
         "url": "https://digital-encomy-main.streamlit.app/",
         "seed": 30
     },
     {
-        "name": "大数据作业平台",
+        "name": "xuejiededashujuzuoye.streamlit.app",
         "desc": "学届大数据作业专用分析平台，集成数据清洗与建模工具。",
         "url": "https://xuejiededashujuzuoye.streamlit.app/",
         "seed": 40
     },
     {
-        "name": "大数据分析系统",
+        "name": "big-data-hmjdjensqzboumvsvydca3.streamlit.app",
         "desc": "企业级大数据解决方案，支持海量数据实时处理与交叉分析。",
         "url": "https://big-data-hmjdjensqzboumvsvydca3.streamlit.app/",
         "seed": 50
     },
     {
-        "name": "ESG数字化平台",
+        "name": "esgdigital.streamlit.app",
         "desc": "企业环境、社会与治理数据评估，提供ESG指标追踪与评级。",
         "url": "https://esgdigital.streamlit.app/",
         "seed": 60
     },
     {
-        "name": "应用分析平台",
+        "name": "app-app1-sp9zaesfztlkn5htxxpdqi.streamlit.app",
         "desc": "通用数据分析平台，支持多源接入与自定义仪表盘。",
         "url": "https://app-app1-sp9zaesfztlkn5htxxpdqi.streamlit.app/",
         "seed": 70
     },
     {
-        "name": "2007-2023 数字化",
+        "name": "20072023digital.streamlit.app",
         "desc": "覆盖2007-2023年企业数字化转型历程，纵向对比趋势。",
         "url": "https://20072023digital.streamlit.app/",
         "seed": 80
     },
     {
-        "name": "1999-2023 数字化",
+        "name": "19992023digital.streamlit.app",
         "desc": "更长周期（1999-2023）企业数字化发展数据洞察。",
         "url": "https://19992023digital.streamlit.app/",
         "seed": 90
     },
     {
-        "name": "企业数字化指数",
+        "name": "1999-2023companydeindex-tgax4uws6a7.streamlit.app",
         "desc": "综合评估企业数字化水平，提供行业对标与改进建议。",
         "url": "https://1999-2023companydeindex-tgax4uws6a7.streamlit.app/",
         "seed": 100
     },
     {
-        "name": "SmartBI 数据可视化",
+        "name": "47.98.202.43 (SmartBI)",
         "desc": "基于SmartBI的企业级可视化平台，支持复杂报表与交互探索。",
         "url": "http://47.98.202.43/smartbi/vision/share.jsp?resid=100ef521ecf6c5860d5917a961a6e0b0",
         "seed": 110
@@ -450,7 +449,6 @@ for i in range(0, len(links_info), cols_per_row):
     for j, (col, item) in enumerate(zip(cols, row_items)):
         with col:
             img_url = f"https://picsum.photos/seed/{item['seed']}/400/200"
-            # 交替按钮类
             btn_alt = "btn-alt" if (i + j) % 2 == 1 else ""
             st.markdown(f"""
             <div class="card-wrapper">
@@ -462,7 +460,7 @@ for i in range(0, len(links_info), cols_per_row):
                         <div class="qr-container">
             """, unsafe_allow_html=True)
             
-            # 二维码
+            # 二维码（居中）
             qr_bytes = generate_qr(item['url'])
             st.image(qr_bytes, width=100, use_column_width="never", output_format="PNG")
             
@@ -473,8 +471,8 @@ for i in range(0, len(links_info), cols_per_row):
             </div>
             """, unsafe_allow_html=True)
             
-            # 按钮（全宽）
-            st.link_button(f"🚀 进入 {item['name']}", item['url'], use_container_width=True)
+            # 跳转按钮（全宽，位于卡片底部）
+            st.link_button(f"🚀 打开", item['url'], use_container_width=True)
 
 # ---------- 核心优势 ----------
 st.markdown('<h2 id="advantages" style="text-align:center; color:#2f2a4a; margin-top:2.5rem;">平台核心优势</h2>', unsafe_allow_html=True)
@@ -502,7 +500,6 @@ for col, adv in zip(cols, adv_data):
 st.markdown('<h2 id="qrcodes" style="text-align:center; color:#2f2a4a; margin-top:2.5rem;">移动端访问</h2>', unsafe_allow_html=True)
 st.markdown('<p style="text-align:center; color:#4a4a6a; margin-bottom:1.2rem;">扫描二维码，在手机上访问对应系统</p>', unsafe_allow_html=True)
 
-# 每行3个二维码卡片
 for i in range(0, len(links_info), 3):
     row = links_info[i:i+3]
     cols = st.columns(3, gap="medium")
