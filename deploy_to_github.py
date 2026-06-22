@@ -1,525 +1,187 @@
 import streamlit as st
 import qrcode
-from io import BytesIO
+from PIL import Image
+import io
+import base64
 
-# ---------- 页面配置 ----------
+# -------------------------- 全局页面配置 科技深色主题 --------------------------
 st.set_page_config(
-    page_title="数字智能 · 链接导航",
-    page_icon="✨",
+    page_title="全域链接导航中台 | 科技门户",
+    page_icon="🌐",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# ---------- 自定义 CSS（淡蓝粉紫 · 毛玻璃 · 精美排版） ----------
-st.markdown("""
+# 自定义CSS 科技风深色渐变、发光按钮、卡片悬浮动画
+custom_css = """
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    .stApp {
-        background: radial-gradient(circle at 10% 20%, #f0e6ff 0%, #e0f0ff 50%, #f5e6ff 100%);
-        color: #2d3a4a;
-        font-family: 'Inter', 'Segoe UI', sans-serif;
-    }
-    header { display: none; }
-    .main-container {
-        max-width: 1300px;
-        margin: 0 auto;
-        padding: 0 1.8rem 2rem;
-    }
-
-    /* 顶部导航 */
-    .top-nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1rem 0 1.2rem;
-        border-bottom: 1px solid rgba(180, 160, 220, 0.25);
-        margin-bottom: 1.8rem;
-        flex-wrap: wrap;
-        gap: 0.8rem;
-    }
-    .logo {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 700;
-        font-size: 1.3rem;
-        color: #6a4c9c;
-        letter-spacing: 0.04em;
-    }
-    .logo svg {
-        width: 28px; height: 28px;
-        stroke: #6a4c9c;
-        fill: none;
-        stroke-width: 2.2;
-    }
-    .nav-links {
-        display: flex;
-        gap: 2rem;
-    }
-    .nav-links a {
-        color: #5a6a8a;
-        text-decoration: none;
-        font-size: 0.95rem;
-        font-weight: 500;
-        transition: color 0.3s;
-    }
-    .nav-links a:hover {
-        color: #7c5cbf;
-    }
-
-    /* Hero */
-    .hero {
-        position: relative;
-        border-radius: 28px;
-        overflow: hidden;
-        margin-bottom: 2.5rem;
-        background: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=300&fit=crop') center/cover no-repeat;
-        box-shadow: 0 8px 30px rgba(100, 80, 180, 0.15);
-    }
-    .hero-overlay {
-        background: linear-gradient(135deg, rgba(240, 230, 255, 0.75), rgba(220, 240, 255, 0.7));
-        backdrop-filter: blur(3px);
-        padding: 3rem 2rem;
-        text-align: center;
-    }
-    .hero h1 {
-        font-size: 2.8rem;
-        font-weight: 800;
-        color: #3b2a5a;
-        margin-bottom: 0.4rem;
-        text-shadow: 0 2px 10px rgba(255,255,255,0.3);
-    }
-    .hero p {
-        font-size: 1.15rem;
-        color: #4a3a6a;
-        max-width: 700px;
-        margin: 0 auto 0.8rem;
-        font-weight: 500;
-    }
-    .hero-btn {
-        display: inline-block;
-        padding: 0.7rem 2.2rem;
-        border-radius: 50px;
-        background: linear-gradient(90deg, #b39ddb, #81d4fa);
-        color: #1f2a3a;
-        font-weight: 600;
-        text-decoration: none;
-        box-shadow: 0 4px 15px rgba(120, 100, 200, 0.25);
-        transition: transform 0.2s, box-shadow 0.2s;
-        border: none;
-        cursor: pointer;
-    }
-    .hero-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 25px rgba(120, 100, 200, 0.4);
-    }
-
-    /* 卡片 */
-    .card-wrapper {
-        background: rgba(255, 255, 255, 0.55);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(120, 100, 180, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        transition: all 0.3s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-    .card-wrapper:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 16px 40px rgba(120, 100, 180, 0.18);
-        border-color: rgba(180, 150, 220, 0.5);
-    }
-    .card-img {
-        width: 100%;
-        height: 170px;
-        object-fit: cover;
-        display: block;
-        border-bottom: 1px solid rgba(200, 180, 220, 0.2);
-    }
-    .card-body {
-        padding: 1.2rem 1.2rem 1.2rem;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    .card-title {
-        font-size: 1.0rem;
-        font-weight: 700;
-        color: #2f2a4a;
-        margin-bottom: 0.3rem;
-        line-height: 1.3;
-        word-break: break-all;
-    }
-    .card-desc {
-        font-size: 0.82rem;
-        color: #4a4a6a;
-        line-height: 1.5;
-        flex: 1;
-        margin-bottom: 0.8rem;
-    }
-    .card-footer {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-        margin-top: auto;
-    }
-    .qr-container {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 0.2rem;
-    }
-    .qr-container img {
-        border-radius: 10px;
-        background: white;
-        padding: 4px;
-        width: 100px;
-        height: 100px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    .stLinkButton button {
-        width: 100%;
-        padding: 0.6rem 0;
-        border-radius: 40px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        border: none;
-        color: #1f1a3a;
-        background: linear-gradient(90deg, #b39ddb, #81d4fa);
-        transition: opacity 0.25s, transform 0.2s;
-        cursor: pointer;
-        box-shadow: 0 2px 10px rgba(120, 100, 200, 0.15);
-    }
-    .stLinkButton button:hover {
-        opacity: 0.9;
-        transform: scale(1.02);
-        box-shadow: 0 4px 18px rgba(120, 100, 200, 0.25);
-    }
-    .btn-alt .stLinkButton button {
-        background: linear-gradient(90deg, #c9b0ff, #a8d8ff);
-    }
-
-    /* 优势 */
-    .adv-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.2rem;
-        margin: 2rem 0;
-    }
-    .adv-card {
-        background: rgba(255, 255, 255, 0.5);
-        backdrop-filter: blur(8px);
-        border-radius: 16px;
-        padding: 1.5rem 1rem;
-        text-align: center;
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    .adv-card:hover {
-        border-color: #b39ddb;
-        box-shadow: 0 4px 20px rgba(120, 100, 200, 0.08);
-    }
-    .adv-icon {
-        font-size: 2.2rem;
-        margin-bottom: 0.4rem;
-    }
-    .adv-card h4 {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #2f2a4a;
-        margin-bottom: 0.2rem;
-    }
-    .adv-card p {
-        font-size: 0.8rem;
-        color: #4a4a6a;
-        line-height: 1.4;
-    }
-
-    /* 二维码集中展示 */
-    .qr-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.2rem;
-        margin: 1.5rem 0;
-    }
-    .qr-grid-item {
-        background: rgba(255, 255, 255, 0.5);
-        backdrop-filter: blur(8px);
-        border-radius: 16px;
-        padding: 1.2rem;
-        text-align: center;
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        transition: border-color 0.3s;
-    }
-    .qr-grid-item:hover {
-        border-color: #b39ddb;
-    }
-    .qr-grid-item img {
-        width: 130px;
-        height: 130px;
-        border-radius: 10px;
-        background: white;
-        padding: 5px;
-        margin-bottom: 0.4rem;
-    }
-    .qr-grid-item .qr-name {
-        font-weight: 600;
-        color: #2f2a4a;
-        font-size: 0.9rem;
-        word-break: break-all;
-    }
-    .qr-grid-item .qr-url {
-        font-size: 0.7rem;
-        color: #5a5a7a;
-        word-break: break-all;
-        line-height: 1.3;
-    }
-
-    /* 页脚 */
-    .footer {
-        text-align: center;
-        border-top: 1px solid rgba(180, 160, 220, 0.2);
-        padding: 2rem 1rem 1rem;
-        margin-top: 2.5rem;
-        color: #4a4a6a;
-        font-size: 0.85rem;
-    }
-    .footer h3 {
-        color: #2f2a4a;
-        font-weight: 700;
-        font-size: 1.2rem;
-        margin-bottom: 0.4rem;
-    }
-    .footer p {
-        max-width: 600px;
-        margin: 0 auto 0.8rem;
-        line-height: 1.6;
-    }
-    .footer-social {
-        display: flex;
-        justify-content: center;
-        gap: 1.2rem;
-        margin-top: 0.6rem;
-    }
-    .footer-social a {
-        color: #4a4a6a;
-        text-decoration: none;
-        font-size: 1.4rem;
-        transition: color 0.3s;
-    }
-    .footer-social a:hover {
-        color: #7c5cbf;
-    }
-
-    @media (max-width: 1024px) {
-        .adv-grid { grid-template-columns: repeat(2, 1fr); }
-        .qr-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 640px) {
-        .hero h1 { font-size: 2rem; }
-        .top-nav { flex-direction: column; align-items: stretch; }
-        .nav-links { justify-content: center; flex-wrap: wrap; gap: 1rem; }
-        .adv-grid, .qr-grid { grid-template-columns: 1fr; }
-    }
+* {
+    font-family: "Microsoft YaHei", sans-serif;
+}
+.main {
+    background: linear-gradient(145deg, #050a1f, #0f1c40, #04102b);
+}
+.block-container {
+    padding: 2rem 4rem !important;
+}
+h1, h2, h3 {
+    color: #00e5ff;
+    text-shadow: 0 0 12px #00ccff80;
+}
+.link-card {
+    background: linear-gradient(135deg, #0a1a3d, #102859);
+    border: 1px solid #00a8ff60;
+    border-radius: 16px;
+    padding: 24px;
+    margin: 12px 0;
+    box-shadow: 0 0 20px #0088ff30;
+    transition: all 0.3s ease;
+}
+.link-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0 32px #00ccff60;
+    border-color: #00e5ff;
+}
+.qrcode-box {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+}
+.stButton>button {
+    background: linear-gradient(90deg, #0077ff, #00ccff);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    padding: 10px 22px;
+    box-shadow: 0 0 10px #0099ff70;
+}
+.stButton>button:hover {
+    box-shadow: 0 0 20px #00e5ff;
+    transform: scale(1.03);
+}
+.divider-line {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ccff, transparent);
+    margin: 30px 0;
+}
 </style>
-""", unsafe_allow_html=True)
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
 
-# ---------- 顶部导航 ----------
-st.markdown("""
-<div class="top-nav">
-    <div class="logo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-        </svg>
-        数字智能 · 聚合导航
-    </div>
-    <div class="nav-links">
-        <a href="#features">功能模块</a>
-        <a href="#advantages">核心优势</a>
-        <a href="#qrcodes">移动端</a>
-        <a href="#about">关于我们</a>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# ---------- Hero ----------
-st.markdown("""
-<div class="hero">
-    <div class="hero-overlay">
-        <h1>✨ 企业数据智能分析平台</h1>
-        <p>整合企业数字化转型 · ESG分析 · 数据可视化，助力智能决策</p>
-        <a class="hero-btn" href="#features">探索数据应用 ↓</a>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# ---------- 功能模块标题 ----------
-st.markdown('<h2 id="features" style="text-align:center; color:#2f2a4a; margin-top:1.5rem;">系统功能介绍</h2>', unsafe_allow_html=True)
-st.markdown('<p style="text-align:center; color:#4a4a6a; margin-bottom:1.8rem;">我们提供多个专业数据系统，满足企业不同维度的分析需求</p>', unsafe_allow_html=True)
-
-# ---------- 链接数据：标题 = 域名/路径（完全对应） ----------
-links_info = [
+# -------------------------- 链接数据源（标题精准对应域名） --------------------------
+link_list = [
     {
-        "name": "newprediction-mg4o5rgtrygzhu2vrsznth.streamlit.app",
-        "desc": "全新升级的企业预测分析模型，提供精准趋势预测，辅助决策制定。",
+        "title": "预测分析平台 newprediction",
         "url": "https://newprediction-mg4o5rgtrygzhu2vrsznth.streamlit.app/",
-        "seed": 10
+        "desc": "预测类数据模型可视化系统"
     },
     {
-        "name": "digital-encomy.streamlit.app",
-        "desc": "专注全球数字经济发展趋势分析，数据可视化呈现产业经济现状。",
+        "title": "数字商业平台 digital-encomy",
         "url": "https://digital-encomy.streamlit.app/",
-        "seed": 20
+        "desc": "数字化商业数据分析看板"
     },
     {
-        "name": "digital-encomy-main.streamlit.app",
-        "desc": "整合多维数据资源，交互式图表展示经济指标，支持自定义筛选。",
+        "title": "数字商业主站 digital-encomy-main",
         "url": "https://digital-encomy-main.streamlit.app/",
-        "seed": 30
+        "desc": "数字商业项目主入口站点"
     },
     {
-        "name": "xuejiededashujuzuoye.streamlit.app",
-        "desc": "学届大数据作业专用分析平台，集成数据清洗与建模工具。",
+        "title": "学生大数据作业平台 xuejiededashujuzuoye",
         "url": "https://xuejiededashujuzuoye.streamlit.app/",
-        "seed": 40
+        "desc": "学生大数据实训作业系统"
     },
     {
-        "name": "big-data-hmjdjensqzboumvsvydca3.streamlit.app",
-        "desc": "企业级大数据解决方案，支持海量数据实时处理与交叉分析。",
+        "title": "海量大数据平台 big-data-hmjdjensqzboumvsvydca",
         "url": "https://big-data-hmjdjensqzboumvsvydca3.streamlit.app/",
-        "seed": 50
+        "desc": "海量离线大数据计算可视化平台"
     },
     {
-        "name": "esgdigital.streamlit.app",
-        "desc": "企业环境、社会与治理数据评估，提供ESG指标追踪与评级。",
+        "title": "ESG数字化看板 esgdigital",
         "url": "https://esgdigital.streamlit.app/",
-        "seed": 60
+        "desc": "企业ESG环境社会治理数字化系统"
     },
     {
-        "name": "app-app1-sp9zaesfztlkn5htxxpdqi.streamlit.app",
-        "desc": "通用数据分析平台，支持多源接入与自定义仪表盘。",
+        "title": "一号业务应用 app-app1-sp9zaesfztlkn5htxxpdqi",
         "url": "https://app-app1-sp9zaesfztlkn5htxxpdqi.streamlit.app/",
-        "seed": 70
+        "desc": "一号业务专属应用门户"
     },
     {
-        "name": "20072023digital.streamlit.app",
-        "desc": "覆盖2007-2023年企业数字化转型历程，纵向对比趋势。",
+        "title": "2007-2023数字业务站 20072023digital",
         "url": "https://20072023digital.streamlit.app/",
-        "seed": 80
+        "desc": "2007-2023年度历史数字业务数据平台"
     },
     {
-        "name": "19992023digital.streamlit.app",
-        "desc": "更长周期（1999-2023）企业数字化发展数据洞察。",
+        "title": "1999-2023智慧介护平台 19992023digital",
         "url": "https://19992023digital.streamlit.app/",
-        "seed": 90
+        "desc": "日式智慧介护/福祉设施电商管理系统（配套介护海报素材）"
     },
     {
-        "name": "1999-2023companydeindex-tgax4uws6a7.streamlit.app",
-        "desc": "综合评估企业数字化水平，提供行业对标与改进建议。",
+        "title": "企业索引后台 1999-2023companydeindex",
         "url": "https://1999-2023companydeindex-tgax4uws6a7.streamlit.app/",
-        "seed": 100
+        "desc": "企业档案索引管理后台系统"
     },
     {
-        "name": "47.98.202.43 (SmartBI)",
-        "desc": "基于SmartBI的企业级可视化平台，支持复杂报表与交互探索。",
+        "title": "SmartBI可视化报表中台",
         "url": "http://47.98.202.43/smartbi/vision/share.jsp?resid=100ef521ecf6c5860d5917a961a6e0b0",
-        "seed": 110
+        "desc": "企业级SmartBI数据可视化共享看板"
     }
 ]
 
-# ---------- 二维码生成 ----------
-def generate_qr(url):
-    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=4, border=2)
-    qr.add_data(url)
+# -------------------------- 二维码生成工具函数 --------------------------
+def generate_qrcode_img(target_url):
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=8,
+        border=2
+    )
+    qr.add_data(target_url)
     qr.make(fit=True)
-    img = qr.make_image(fill_color="#2f2a4a", back_color="white")
-    buf = BytesIO()
+    img = qr.make_image(fill_color="#001133", back_color="white")
+    buf = io.BytesIO()
     img.save(buf, format="PNG")
-    return buf.getvalue()
+    buf.seek(0)
+    return buf
 
-# ---------- 渲染卡片网格（每行3个） ----------
-cols_per_row = 3
-for i in range(0, len(links_info), cols_per_row):
-    row_items = links_info[i:i+cols_per_row]
-    cols = st.columns(cols_per_row, gap="medium")
-    for j, (col, item) in enumerate(zip(cols, row_items)):
-        with col:
-            img_url = f"https://picsum.photos/seed/{item['seed']}/400/200"
-            btn_alt = "btn-alt" if (i + j) % 2 == 1 else ""
-            st.markdown(f"""
-            <div class="card-wrapper">
-                <img class="card-img" src="{img_url}" alt="{item['name']}">
-                <div class="card-body">
-                    <div class="card-title">{item['name']}</div>
-                    <div class="card-desc">{item['desc']}</div>
-                    <div class="card-footer">
-                        <div class="qr-container">
-            """, unsafe_allow_html=True)
-            
-            # 二维码（居中）
-            qr_bytes = generate_qr(item['url'])
-            st.image(qr_bytes, width=100, use_column_width="never", output_format="PNG")
-            
-            st.markdown("""
-                        </div>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # 跳转按钮（全宽，位于卡片底部）
-            st.link_button(f"🚀 打开", item['url'], use_container_width=True)
-
-# ---------- 核心优势 ----------
-st.markdown('<h2 id="advantages" style="text-align:center; color:#2f2a4a; margin-top:2.5rem;">平台核心优势</h2>', unsafe_allow_html=True)
-st.markdown('<p style="text-align:center; color:#4a4a6a; margin-bottom:1.2rem;">整合多种先进技术，提供全方位数据分析解决方案</p>', unsafe_allow_html=True)
-
-adv_data = [
-    {"icon": "📊", "title": "整合多维数据", "desc": "支持多个数据源统一接入"},
-    {"icon": "📈", "title": "专业算法引擎", "desc": "精准预测趋势，辅助决策"},
-    {"icon": "⏱️", "title": "响应式设计", "desc": "完美支持PC与移动端"},
-    {"icon": "🧩", "title": "模块化定制", "desc": "灵活组合分析模块"}
-]
-
-cols = st.columns(4)
-for col, adv in zip(cols, adv_data):
-    with col:
-        st.markdown(f"""
-        <div class="adv-card">
-            <div class="adv-icon">{adv['icon']}</div>
-            <h4>{adv['title']}</h4>
-            <p>{adv['desc']}</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-# ---------- 二维码集中展示（移动端访问） ----------
-st.markdown('<h2 id="qrcodes" style="text-align:center; color:#2f2a4a; margin-top:2.5rem;">移动端访问</h2>', unsafe_allow_html=True)
-st.markdown('<p style="text-align:center; color:#4a4a6a; margin-bottom:1.2rem;">扫描二维码，在手机上访问对应系统</p>', unsafe_allow_html=True)
-
-for i in range(0, len(links_info), 3):
-    row = links_info[i:i+3]
-    cols = st.columns(3, gap="medium")
-    for col, item in zip(cols, row):
-        with col:
-            qr_bytes = generate_qr(item['url'])
-            st.image(qr_bytes, width=130, use_column_width="never", output_format="PNG")
-            st.markdown(f"<div class='qr-name'>{item['name']}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='qr-url'>{item['url']}</div>", unsafe_allow_html=True)
-
-# ---------- 页脚 ----------
+# -------------------------- 页面头部 --------------------------
 st.markdown("""
-<div class="footer" id="about">
-    <h3>✨ 关于我们</h3>
-    <p>我们致力于为企业提供专业的数据智能分析工具，整合多个数据分析平台与可视化系统，通过先进的算法与模型技术，帮助企业实现数据驱动决策，优化运营流程。</p>
-    <div class="footer-social">
-        <a href="#" target="_blank">🐙</a>
-        <a href="#" target="_blank">🐦</a>
-        <a href="#" target="_blank">🔗</a>
-    </div>
-    <div style="margin-top:0.8rem; font-size:0.7rem; opacity:0.6;">© 2026 数字智能导航 · 淡蓝粉紫设计</div>
-</div>
+# 🌐 全域业务链接导航中台
+### 科技一体化入口 | Streamlit & SmartBI 统一门户
+<div class="divider-line"></div>
+""", unsafe_allow_html=True)
+
+# 两栏循环渲染所有链接卡片
+col_count = 2
+cols = st.columns(col_count, gap="large")
+for idx, item in enumerate(link_list):
+    current_col = cols[idx % col_count]
+    with current_col:
+        # 生成二维码图片流
+        qr_buffer = generate_qrcode_img(item["url"])
+        qr_img = Image.open(qr_buffer)
+
+        st.markdown(f'<div class="link-card">', unsafe_allow_html=True)
+        st.subheader(f"🔹 {item['title']}")
+        st.caption(f"说明：{item['desc']}")
+        st.code(item["url"], language="text")
+        
+        # 分栏：二维码 + 跳转按钮
+        sub_col1, sub_col2 = st.columns([1, 1.2])
+        with sub_col1:
+            st.markdown('<div class="qrcode-box">', unsafe_allow_html=True)
+            st.image(qr_img, caption="扫码直达", width=140)
+            st.markdown('</div>', unsafe_allow_html=True)
+        with sub_col2:
+            st.link_button("🚀 立即访问站点", url=item["url"], use_container_width=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+
+# 页脚
+st.markdown("""
+<div class="divider-line"></div>
+<p style="text-align:center; color:#88ccff; font-size:14px;">
+导航中台 · 科技可视化门户系统 | 自动生成二维码 · 一键跳转 · 深色科技主题
+</p>
 """, unsafe_allow_html=True)
