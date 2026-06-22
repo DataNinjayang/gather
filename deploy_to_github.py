@@ -1,193 +1,210 @@
 import streamlit as st
 import qrcode
 from io import BytesIO
-import base64
 
 # ---------- 页面配置 ----------
 st.set_page_config(
-    page_title="数字智能分析平台 · 链接导航",
-    page_icon="📊",
+    page_title="数字智能 · 链接导航",
+    page_icon="✨",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# ---------- 自定义CSS（完全参考HTML风格） ----------
+# ---------- 自定义 CSS（淡蓝粉紫 · 毛玻璃 · 精美排版） ----------
 st.markdown("""
 <style>
-    /* 全局重置 & 字体 */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    /* 字体 & 全局 */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     .stApp {
-        background: #050b14;
-        color: #e8ecf1;
+        background: radial-gradient(circle at 10% 20%, #f0e6ff 0%, #e0f0ff 50%, #f5e6ff 100%);
+        color: #2d3a4a;
         font-family: 'Inter', 'Segoe UI', sans-serif;
     }
     header { display: none; }
     .main-container {
-        max-width: 1200px;
+        max-width: 1300px;
         margin: 0 auto;
-        padding: 0 1.5rem 2rem;
+        padding: 0 1.8rem 2rem;
     }
 
-    /* ----- 顶部导航（模拟） ----- */
+    /* ----- 顶部导航 ----- */
     .top-nav {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 1.2rem 0;
-        border-bottom: 1px solid #1a2a44;
-        margin-bottom: 2rem;
+        padding: 1rem 0 1.2rem;
+        border-bottom: 1px solid rgba(180, 160, 220, 0.25);
+        margin-bottom: 1.8rem;
         flex-wrap: wrap;
-        gap: 1rem;
+        gap: 0.8rem;
     }
     .logo {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         font-weight: 700;
-        font-size: 1.2rem;
-        color: #00d4ff;
-        letter-spacing: 0.05em;
+        font-size: 1.3rem;
+        color: #6a4c9c;
+        letter-spacing: 0.04em;
     }
     .logo svg {
-        width: 28px;
-        height: 28px;
-        stroke: #00d4ff;
+        width: 28px; height: 28px;
+        stroke: #6a4c9c;
         fill: none;
-        stroke-width: 2;
+        stroke-width: 2.2;
     }
     .nav-links {
         display: flex;
         gap: 2rem;
     }
     .nav-links a {
-        color: #8b9bb4;
+        color: #5a6a8a;
         text-decoration: none;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+        font-weight: 500;
         transition: color 0.3s;
     }
     .nav-links a:hover {
-        color: #00d4ff;
+        color: #7c5cbf;
     }
 
-    /* ----- Hero 区域 ----- */
+    /* ----- Hero 区域（带背景图） ----- */
     .hero {
         position: relative;
-        text-align: center;
-        padding: 4rem 1rem 5rem;
-        margin-bottom: 2rem;
-        border-radius: 24px;
+        border-radius: 28px;
         overflow: hidden;
-        background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=400&fit=crop') center/cover no-repeat;
+        margin-bottom: 2.5rem;
+        background: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=300&fit=crop') center/cover no-repeat;
+        box-shadow: 0 8px 30px rgba(100, 80, 180, 0.15);
     }
-    .hero::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(180deg, rgba(5,11,20,0.4) 0%, #050b14 100%);
-        z-index: 0;
-    }
-    .hero-content {
-        position: relative;
-        z-index: 1;
-        max-width: 800px;
-        margin: 0 auto;
+    .hero-overlay {
+        background: linear-gradient(135deg, rgba(240, 230, 255, 0.75), rgba(220, 240, 255, 0.7));
+        backdrop-filter: blur(3px);
+        padding: 3rem 2rem;
+        text-align: center;
     }
     .hero h1 {
         font-size: 2.8rem;
-        font-weight: 700;
-        background: linear-gradient(90deg, #00d4ff, #a855f7);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 0.8rem;
+        font-weight: 800;
+        color: #3b2a5a;
+        margin-bottom: 0.4rem;
+        text-shadow: 0 2px 10px rgba(255,255,255,0.3);
     }
     .hero p {
-        color: #8b9bb4;
-        font-size: 1.1rem;
-        max-width: 600px;
-        margin: 0 auto 1.8rem;
+        font-size: 1.15rem;
+        color: #4a3a6a;
+        max-width: 700px;
+        margin: 0 auto 0.8rem;
+        font-weight: 500;
+    }
+    .hero-btn {
+        display: inline-block;
+        padding: 0.7rem 2.2rem;
+        border-radius: 50px;
+        background: linear-gradient(90deg, #b39ddb, #81d4fa);
+        color: #1f2a3a;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 4px 15px rgba(120, 100, 200, 0.25);
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+    .hero-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(120, 100, 200, 0.4);
     }
 
-    /* ----- 卡片样式（玻璃态 + 悬停） ----- */
+    /* ----- 卡片（毛玻璃 · 淡蓝粉紫） ----- */
     .card-wrapper {
-        background: #0a1120;
-        border: 1px solid #1a2a44;
-        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.55);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 20px;
         overflow: hidden;
-        transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+        box-shadow: 0 4px 20px rgba(120, 100, 180, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        transition: all 0.3s ease;
         height: 100%;
         display: flex;
         flex-direction: column;
     }
     .card-wrapper:hover {
         transform: translateY(-6px);
-        box-shadow: 0 12px 40px rgba(0,0,0,0.5);
-        border-color: #00d4ff;
+        box-shadow: 0 16px 40px rgba(120, 100, 180, 0.18);
+        border-color: rgba(180, 150, 220, 0.5);
     }
     .card-img {
         width: 100%;
-        height: 160px;
+        height: 170px;
         object-fit: cover;
         display: block;
+        border-bottom: 1px solid rgba(200, 180, 220, 0.2);
     }
     .card-body {
-        padding: 1.2rem 1.2rem 1.4rem;
+        padding: 1.2rem 1.2rem 1.2rem;
         flex: 1;
         display: flex;
         flex-direction: column;
     }
     .card-title {
-        font-size: 1.05rem;
+        font-size: 1.1rem;
         font-weight: 700;
-        color: #e8ecf1;
+        color: #2f2a4a;
         margin-bottom: 0.3rem;
+        line-height: 1.3;
     }
     .card-desc {
-        font-size: 0.82rem;
-        color: #8b9bb4;
+        font-size: 0.85rem;
+        color: #4a4a6a;
         line-height: 1.5;
         flex: 1;
-        margin-bottom: 1rem;
+        margin-bottom: 0.8rem;
     }
     .card-footer {
         display: flex;
         flex-direction: column;
+        align-items: center;
         gap: 0.6rem;
         margin-top: auto;
     }
     .qr-container {
         display: flex;
         justify-content: center;
-        margin: 0.2rem 0;
+        margin-bottom: 0.2rem;
     }
     .qr-container img {
-        border-radius: 8px;
+        border-radius: 10px;
         background: white;
         padding: 4px;
         width: 100px;
         height: 100px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
     .stLinkButton button {
         width: 100%;
         padding: 0.6rem 0;
-        border-radius: 8px;
+        border-radius: 40px;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         border: none;
-        color: #fff;
-        background: linear-gradient(90deg, #2563eb, #1d4ed8);
-        transition: opacity 0.3s, transform 0.3s;
+        color: #1f1a3a;
+        background: linear-gradient(90deg, #b39ddb, #81d4fa);
+        transition: opacity 0.25s, transform 0.2s;
         cursor: pointer;
+        box-shadow: 0 2px 10px rgba(120, 100, 200, 0.15);
     }
     .stLinkButton button:hover {
         opacity: 0.9;
         transform: scale(1.02);
+        box-shadow: 0 4px 18px rgba(120, 100, 200, 0.25);
     }
-    /* 不同按钮颜色（按顺序循环） */
-    .btn-purple .stLinkButton button { background: linear-gradient(90deg, #7c3aed, #6d28d9); }
-    .btn-cyan .stLinkButton button { background: linear-gradient(90deg, #0891b2, #0e7490); }
+    /* 按钮交替颜色（粉紫 / 蓝紫） */
+    .btn-alt .stLinkButton button {
+        background: linear-gradient(90deg, #c9b0ff, #a8d8ff);
+    }
 
-    /* ----- 核心优势 ----- */
+    /* ----- 优势卡片（浅色） ----- */
     .adv-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -195,94 +212,136 @@ st.markdown("""
         margin: 2rem 0;
     }
     .adv-card {
-        background: #0a1120;
-        border: 1px solid #1a2a44;
-        border-radius: 12px;
-        padding: 1.4rem 1rem;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        padding: 1.5rem 1rem;
         text-align: center;
-        transition: border-color 0.3s;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        transition: border-color 0.3s, box-shadow 0.3s;
     }
     .adv-card:hover {
-        border-color: #00d4ff;
+        border-color: #b39ddb;
+        box-shadow: 0 4px 20px rgba(120, 100, 200, 0.08);
     }
     .adv-icon {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
-        color: #00d4ff;
+        font-size: 2.2rem;
+        margin-bottom: 0.4rem;
     }
     .adv-card h4 {
-        font-size: 0.95rem;
+        font-size: 1rem;
         font-weight: 700;
-        color: #e8ecf1;
-        margin-bottom: 0.3rem;
+        color: #2f2a4a;
+        margin-bottom: 0.2rem;
     }
     .adv-card p {
-        font-size: 0.78rem;
-        color: #8b9bb4;
+        font-size: 0.8rem;
+        color: #4a4a6a;
         line-height: 1.4;
+    }
+
+    /* ----- 二维码集中展示卡片 ----- */
+    .qr-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+        margin: 1.5rem 0;
+    }
+    .qr-grid-item {
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        padding: 1.2rem;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        transition: border-color 0.3s;
+    }
+    .qr-grid-item:hover {
+        border-color: #b39ddb;
+    }
+    .qr-grid-item img {
+        width: 130px;
+        height: 130px;
+        border-radius: 10px;
+        background: white;
+        padding: 5px;
+        margin-bottom: 0.4rem;
+    }
+    .qr-grid-item .qr-name {
+        font-weight: 600;
+        color: #2f2a4a;
+        font-size: 0.95rem;
+    }
+    .qr-grid-item .qr-url {
+        font-size: 0.7rem;
+        color: #5a5a7a;
+        word-break: break-all;
+        line-height: 1.3;
     }
 
     /* ----- 页脚 ----- */
     .footer {
         text-align: center;
-        border-top: 1px solid #1a2a44;
+        border-top: 1px solid rgba(180, 160, 220, 0.2);
         padding: 2rem 1rem 1rem;
-        margin-top: 3rem;
-        color: #8b9bb4;
-        font-size: 0.82rem;
+        margin-top: 2.5rem;
+        color: #4a4a6a;
+        font-size: 0.85rem;
     }
     .footer h3 {
-        color: #e8ecf1;
-        font-size: 1.1rem;
-        margin-bottom: 0.5rem;
+        color: #2f2a4a;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-bottom: 0.4rem;
     }
     .footer p {
         max-width: 600px;
-        margin: 0 auto 1rem;
+        margin: 0 auto 0.8rem;
         line-height: 1.6;
     }
     .footer-social {
         display: flex;
         justify-content: center;
-        gap: 1rem;
-        margin-top: 0.8rem;
+        gap: 1.2rem;
+        margin-top: 0.6rem;
     }
     .footer-social a {
-        color: #8b9bb4;
+        color: #4a4a6a;
         text-decoration: none;
-        font-size: 1.2rem;
+        font-size: 1.4rem;
         transition: color 0.3s;
     }
     .footer-social a:hover {
-        color: #00d4ff;
+        color: #7c5cbf;
     }
 
     /* 响应式 */
     @media (max-width: 1024px) {
         .adv-grid { grid-template-columns: repeat(2, 1fr); }
+        .qr-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 640px) {
         .hero h1 { font-size: 2rem; }
         .top-nav { flex-direction: column; align-items: stretch; }
         .nav-links { justify-content: center; flex-wrap: wrap; gap: 1rem; }
-        .adv-grid { grid-template-columns: 1fr; }
+        .adv-grid, .qr-grid { grid-template-columns: 1fr; }
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- 顶部导航（HTML模拟） ----------
+# ---------- 顶部导航 ----------
 st.markdown("""
 <div class="top-nav">
     <div class="logo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
         </svg>
-        企业数据智能平台
+        数字智能 · 聚合导航
     </div>
     <div class="nav-links">
         <a href="#features">功能模块</a>
         <a href="#advantages">核心优势</a>
-        <a href="#qrcodes">移动端访问</a>
+        <a href="#qrcodes">移动端</a>
         <a href="#about">关于我们</a>
     </div>
 </div>
@@ -291,99 +350,94 @@ st.markdown("""
 # ---------- Hero 区域 ----------
 st.markdown("""
 <div class="hero">
-    <div class="hero-content">
-        <h1>企业数据智能分析平台</h1>
-        <p>整合企业数字化转型、ESG分析与数据可视化，助力企业决策智能化</p>
+    <div class="hero-overlay">
+        <h1>✨ 企业数据智能分析平台</h1>
+        <p>整合企业数字化转型 · ESG分析 · 数据可视化，助力智能决策</p>
+        <a class="hero-btn" href="#features">探索数据应用 ↓</a>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# 在 Hero 下方放一个 CTA 按钮（用 st.link_button 实现）
-col1, col2, col3 = st.columns([1,2,1])
-with col2:
-    st.link_button("🚀 探索数据应用", "#features", use_container_width=True)
+# ---------- 功能模块标题 ----------
+st.markdown('<h2 id="features" style="text-align:center; color:#2f2a4a; margin-top:1.5rem;">系统功能介绍</h2>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center; color:#4a4a6a; margin-bottom:1.8rem;">我们提供多个专业数据系统，满足企业不同维度的分析需求</p>', unsafe_allow_html=True)
 
-# ---------- 功能模块（卡片网格） ----------
-st.markdown('<h2 style="text-align:center; margin-top:2.5rem;">系统功能介绍</h2>', unsafe_allow_html=True)
-st.markdown('<p style="text-align:center; color:#8b9bb4; margin-bottom:2rem;">我们提供多个专业数据系统，满足企业不同维度的数据分析需求</p>', unsafe_allow_html=True)
-
-# ---------- 链接数据（名称、描述、URL、图片种子） ----------
-# 描述和名称参考 HTML 内容，可自由修改
+# ---------- 链接数据（可自由修改名称、描述、URL） ----------
 links_info = [
     {
         "name": "新预测模型",
-        "desc": "全新升级的企业预测分析模型，提供精准趋势预测，智能分析辅助决策制定，助力企业数字化战略选择。",
+        "desc": "全新升级的企业预测分析模型，提供精准趋势预测，辅助决策制定。",
         "url": "https://newprediction-mg4o5rgtrygzhu2vrsznth.streamlit.app/",
-        "seed": 1
-    },
-    {
-        "name": "数字经济分析",
-        "desc": "专注于数字经济领域，对全球数字经济发展趋势分析，数据可视化呈现产业经济现状，支持一键导出报告。",
-        "url": "https://digital-encomy.streamlit.app/",
-        "seed": 2
-    },
-    {
-        "name": "数字经济主站",
-        "desc": "整合企业多维数据资源，通过交互式图表直观展示经济指标，支持自定义筛选与深度数据挖掘。",
-        "url": "https://digital-encomy-main.streamlit.app/",
-        "seed": 3
-    },
-    {
-        "name": "大数据作业平台",
-        "desc": "学届大数据作业专用分析平台，集成多种数据清洗与建模工具，支持批量处理与自动化分析流程。",
-        "url": "https://xuejiededashujuzuoye.streamlit.app/",
-        "seed": 4
-    },
-    {
-        "name": "大数据分析系统",
-        "desc": "企业级大数据分析解决方案，支持海量数据实时处理，多维度交叉分析，助力业务增长与运营优化。",
-        "url": "https://big-data-hmjdjensqzboumvsvydca3.streamlit.app/",
-        "seed": 5
-    },
-    {
-        "name": "ESG数字化平台",
-        "desc": "专注企业环境、社会与治理数据评估，提供ESG指标追踪、评级分析与可持续发展报告生成服务。",
-        "url": "https://esgdigital.streamlit.app/",
-        "seed": 6
-    },
-    {
-        "name": "应用分析平台",
-        "desc": "通用应用数据分析平台，支持多源数据接入与自定义仪表盘，满足个性化业务分析场景需求。",
-        "url": "https://app-app1-sp9zaesfztlkn5htxxpdqi.streamlit.app/",
-        "seed": 7
-    },
-    {
-        "name": "2007-2023 数字化",
-        "desc": "覆盖2007至2023年企业数字化转型历程数据，纵向对比分析企业数字化成熟度演变趋势。",
-        "url": "https://20072023digital.streamlit.app/",
-        "seed": 8
-    },
-    {
-        "name": "1999-2023 数字化",
-        "desc": "更长周期的企业数字化发展数据追踪，从1999年至2023年，洞察二十余年数字化变革规律。",
-        "url": "https://19992023digital.streamlit.app/",
-        "seed": 9
-    },
-    {
-        "name": "企业数字化指数",
-        "desc": "综合评估企业数字化水平的核心指标体系，提供行业对标、排名分析与改进建议。",
-        "url": "https://1999-2023companydeindex-tgax4uws6a7.streamlit.app/",
         "seed": 10
     },
     {
+        "name": "数字经济分析",
+        "desc": "专注全球数字经济发展趋势分析，数据可视化呈现产业经济现状。",
+        "url": "https://digital-encomy.streamlit.app/",
+        "seed": 20
+    },
+    {
+        "name": "数字经济主站",
+        "desc": "整合多维数据资源，交互式图表展示经济指标，支持自定义筛选。",
+        "url": "https://digital-encomy-main.streamlit.app/",
+        "seed": 30
+    },
+    {
+        "name": "大数据作业平台",
+        "desc": "学届大数据作业专用分析平台，集成数据清洗与建模工具。",
+        "url": "https://xuejiededashujuzuoye.streamlit.app/",
+        "seed": 40
+    },
+    {
+        "name": "大数据分析系统",
+        "desc": "企业级大数据解决方案，支持海量数据实时处理与交叉分析。",
+        "url": "https://big-data-hmjdjensqzboumvsvydca3.streamlit.app/",
+        "seed": 50
+    },
+    {
+        "name": "ESG数字化平台",
+        "desc": "企业环境、社会与治理数据评估，提供ESG指标追踪与评级。",
+        "url": "https://esgdigital.streamlit.app/",
+        "seed": 60
+    },
+    {
+        "name": "应用分析平台",
+        "desc": "通用数据分析平台，支持多源接入与自定义仪表盘。",
+        "url": "https://app-app1-sp9zaesfztlkn5htxxpdqi.streamlit.app/",
+        "seed": 70
+    },
+    {
+        "name": "2007-2023 数字化",
+        "desc": "覆盖2007-2023年企业数字化转型历程，纵向对比趋势。",
+        "url": "https://20072023digital.streamlit.app/",
+        "seed": 80
+    },
+    {
+        "name": "1999-2023 数字化",
+        "desc": "更长周期（1999-2023）企业数字化发展数据洞察。",
+        "url": "https://19992023digital.streamlit.app/",
+        "seed": 90
+    },
+    {
+        "name": "企业数字化指数",
+        "desc": "综合评估企业数字化水平，提供行业对标与改进建议。",
+        "url": "https://1999-2023companydeindex-tgax4uws6a7.streamlit.app/",
+        "seed": 100
+    },
+    {
         "name": "SmartBI 数据可视化",
-        "desc": "基于SmartBI的企业级数据可视化平台，支持复杂报表设计与交互式数据探索，助力决策层洞察业务。",
+        "desc": "基于SmartBI的企业级可视化平台，支持复杂报表与交互探索。",
         "url": "http://47.98.202.43/smartbi/vision/share.jsp?resid=100ef521ecf6c5860d5917a961a6e0b0",
-        "seed": 11
+        "seed": 110
     }
 ]
 
-# ---------- 二维码生成函数 ----------
+# ---------- 二维码生成 ----------
 def generate_qr(url):
     qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=4, border=2)
     qr.add_data(url)
     qr.make(fit=True)
-    img = qr.make_image(fill_color="#050b14", back_color="white")
+    img = qr.make_image(fill_color="#2f2a4a", back_color="white")
     buf = BytesIO()
     img.save(buf, format="PNG")
     return buf.getvalue()
@@ -393,20 +447,11 @@ cols_per_row = 3
 for i in range(0, len(links_info), cols_per_row):
     row_items = links_info[i:i+cols_per_row]
     cols = st.columns(cols_per_row, gap="medium")
-    for col, item in zip(cols, row_items):
+    for j, (col, item) in enumerate(zip(cols, row_items)):
         with col:
-            # 卡片图片（使用 picsum 随机图片，根据 seed 固定）
             img_url = f"https://picsum.photos/seed/{item['seed']}/400/200"
-            # 按钮颜色循环：根据索引 mod 3
-            btn_class = ""
-            if i % 3 == 0:
-                btn_class = ""  # 默认蓝色
-            elif i % 3 == 1:
-                btn_class = "btn-purple"
-            else:
-                btn_class = "btn-cyan"
-            
-            # 构建卡片
+            # 交替按钮类
+            btn_alt = "btn-alt" if (i + j) % 2 == 1 else ""
             st.markdown(f"""
             <div class="card-wrapper">
                 <img class="card-img" src="{img_url}" alt="{item['name']}">
@@ -417,7 +462,7 @@ for i in range(0, len(links_info), cols_per_row):
                         <div class="qr-container">
             """, unsafe_allow_html=True)
             
-            # 插入二维码
+            # 二维码
             qr_bytes = generate_qr(item['url'])
             st.image(qr_bytes, width=100, use_column_width="never", output_format="PNG")
             
@@ -428,31 +473,18 @@ for i in range(0, len(links_info), cols_per_row):
             </div>
             """, unsafe_allow_html=True)
             
-            # 按钮（放在卡片外部，但使用 link_button 会另起一行，我们放在卡片内部用 markdown 模拟按钮？）
-            # 为了保持卡片内按钮，我们使用 st.link_button 放在卡片外面，但会破坏结构。
-            # 解决：用 st.markdown 加一个容器，然后放 link_button，但 link_button 会占据整行，我们可用 columns 控制。
-            # 或者使用 st.button 配合 js 跳转？但推荐 link_button。
-            # 我们简单在卡片下方放 link_button，但会超出卡片。更佳：在卡片内用 st.link_button 放在容器内，但 streamlit 的组件不能放在 markdown 内。
-            # 替代方案：使用 st.button 并利用 st.markdown 的 meta refresh 或使用 st.experimental_rerun？不推荐。
-            # 稳妥方案：使用 st.link_button 放在卡片下方，视觉上仍属于卡片。
-            # 我们将 link_button 放在卡片容器外，但通过相同列来对齐。
-            # 由于我们已经在 with col 中，我们可以在 markdown 后直接调用 st.link_button，它会在卡片下方。
-            # 但为了保持卡片整体，我们将 link_button 放在卡片 markdown 后面，并设置样式为全宽。
-            # 我们可以为 link_button 包裹一个 div，但 link_button 本身是块级。
-            # 我们直接放置，它会出现在卡片下方，但我们可以调整样式使间距紧凑。
-            
-            # 放置按钮（使用 link_button）
-            st.link_button(f"进入 {item['name']}", item['url'], use_container_width=True)
+            # 按钮（全宽）
+            st.link_button(f"🚀 进入 {item['name']}", item['url'], use_container_width=True)
 
-# ---------- 核心优势（四个特点） ----------
-st.markdown('<h2 style="text-align:center; margin-top:3rem;">平台核心优势</h2>', unsafe_allow_html=True)
-st.markdown('<p style="text-align:center; color:#8b9bb4; margin-bottom:2rem;">我们的系统整合多种先进技术，为企业提供全方位的数据分析解决方案</p>', unsafe_allow_html=True)
+# ---------- 核心优势 ----------
+st.markdown('<h2 id="advantages" style="text-align:center; color:#2f2a4a; margin-top:2.5rem;">平台核心优势</h2>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center; color:#4a4a6a; margin-bottom:1.2rem;">整合多种先进技术，提供全方位数据分析解决方案</p>', unsafe_allow_html=True)
 
 adv_data = [
-    {"icon": "📊", "title": "整合企业多维数据", "desc": "支持多个数据源统一接入与整合"},
-    {"icon": "📈", "title": "专业级工具", "desc": "搭载高级算法引擎，精准预测趋势"},
-    {"icon": "⏱️", "title": "响应式设计", "desc": "完美支持PC端与移动端无缝访问"},
-    {"icon": "🧩", "title": "模块化系统", "desc": "灵活组合不同分析模块，定制专属方案"}
+    {"icon": "📊", "title": "整合多维数据", "desc": "支持多个数据源统一接入"},
+    {"icon": "📈", "title": "专业算法引擎", "desc": "精准预测趋势，辅助决策"},
+    {"icon": "⏱️", "title": "响应式设计", "desc": "完美支持PC与移动端"},
+    {"icon": "🧩", "title": "模块化定制", "desc": "灵活组合分析模块"}
 ]
 
 cols = st.columns(4)
@@ -466,9 +498,9 @@ for col, adv in zip(cols, adv_data):
         </div>
         """, unsafe_allow_html=True)
 
-# ---------- 二维码集中展示区（可选，为了更接近HTML） ----------
-st.markdown('<h2 style="text-align:center; margin-top:3rem;">移动端访问</h2>', unsafe_allow_html=True)
-st.markdown('<p style="text-align:center; color:#8b9bb4; margin-bottom:2rem;">扫描下方二维码，在手机上访问对应数据系统</p>', unsafe_allow_html=True)
+# ---------- 二维码集中展示（移动端访问） ----------
+st.markdown('<h2 id="qrcodes" style="text-align:center; color:#2f2a4a; margin-top:2.5rem;">移动端访问</h2>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center; color:#4a4a6a; margin-bottom:1.2rem;">扫描二维码，在手机上访问对应系统</p>', unsafe_allow_html=True)
 
 # 每行3个二维码卡片
 for i in range(0, len(links_info), 3):
@@ -477,20 +509,20 @@ for i in range(0, len(links_info), 3):
     for col, item in zip(cols, row):
         with col:
             qr_bytes = generate_qr(item['url'])
-            st.image(qr_bytes, width=140, use_column_width="never", output_format="PNG")
-            st.markdown(f"<div style='text-align:center; font-weight:600;'>{item['name']}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div style='text-align:center; font-size:0.7rem; color:#8b9bb4; word-break:break-all;'>{item['url']}</div>", unsafe_allow_html=True)
+            st.image(qr_bytes, width=130, use_column_width="never", output_format="PNG")
+            st.markdown(f"<div class='qr-name'>{item['name']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='qr-url'>{item['url']}</div>", unsafe_allow_html=True)
 
 # ---------- 页脚 ----------
 st.markdown("""
 <div class="footer" id="about">
-    <h3>关于我们</h3>
+    <h3>✨ 关于我们</h3>
     <p>我们致力于为企业提供专业的数据智能分析工具，整合多个数据分析平台与可视化系统，通过先进的算法与模型技术，帮助企业实现数据驱动决策，优化运营流程。</p>
     <div class="footer-social">
         <a href="#" target="_blank">🐙</a>
         <a href="#" target="_blank">🐦</a>
         <a href="#" target="_blank">🔗</a>
     </div>
-    <div style="margin-top:1rem; font-size:0.7rem; opacity:0.6;">© 2026 企业数据智能平台 · 链接导航</div>
+    <div style="margin-top:0.8rem; font-size:0.7rem; opacity:0.6;">© 2026 数字智能导航 · 淡蓝粉紫设计</div>
 </div>
 """, unsafe_allow_html=True)
