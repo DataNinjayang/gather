@@ -8,3 +8,4 @@ markdown-it-py>=4.2.0
 mdurl>=0.1.2
 pygments>=2.20.0
 # 标准库无需安装：os、io
+streamlit>=1.38.0
