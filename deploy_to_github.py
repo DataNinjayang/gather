@@ -698,4 +698,45 @@ for idx, item in enumerate(GALLERY_DATA):
         <div class="gallery-card">
             <img src="{item["img"]}" alt="{item["title"]}">
             <div class="gallery-overlay">
-                <h4>{item["titl
+                <h4>{item["title"]}</h4>
+                <p>{item["desc"]}</p>
+            </div>
+        </div>
+        ''', unsafe_allow_html=True)
+
+# ===================== 核心优势模块 =====================
+st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="section-header" id="核心优势">
+    <div class="section-tag">CORE ADVANTAGES</div>
+    <h2 class="section-title">核心能力优势</h2>
+    <p class="section-sub">企业级技术架构，保障稳定高效的数据分析服务</p>
+</div>
+""", unsafe_allow_html=True)
+
+ADVANTAGE_DATA = [
+    {"icon": "⚡", "title": "极速访问", "desc": "全站CDN加速，毫秒级响应"},
+    {"icon": "🔒", "title": "安全稳定", "desc": "企业级安全防护，数据加密"},
+    {"icon": "📊", "title": "多维分析", "desc": "全维度数据洞察，可视化呈现"},
+    {"icon": "📱", "title": "多端适配", "desc": "PC/平板/手机全终端兼容"}
+]
+
+a_col1, a_col2, a_col3, a_col4 = st.columns(4, gap="medium")
+adv_cols = [a_col1, a_col2, a_col3, a_col4]
+for idx, adv in enumerate(ADVANTAGE_DATA):
+    with adv_cols[idx]:
+        st.markdown(f'''
+        <div class="adv-card">
+            <div class="adv-icon">{adv["icon"]}</div>
+            <div class="adv-title">{adv["title"]}</div>
+            <div class="adv-desc">{adv["desc"]}</div>
+        </div>
+        ''', unsafe_allow_html=True)
+
+# ===================== 页脚 + 闭合内容层 =====================
+st.markdown("""
+<div class="footer">
+    © 企业数据智能分析平台 · 数字化转型全域导航中台 · 技术赋能业务增长
+</div>
+</div>
+""", unsafe_allow_html=True)
